@@ -1,0 +1,4 @@
+simple.bundle
+	classpath: 1
+dep.bundle
+	classpath: [0)

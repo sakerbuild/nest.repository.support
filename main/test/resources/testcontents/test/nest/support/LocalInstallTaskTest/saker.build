@@ -1,0 +1,7 @@
+install(){
+	nest.local.install(test.bundle.jar)
+}
+use(
+	out output = test.bundle.task()
+) {
+}

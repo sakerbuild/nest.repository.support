@@ -1,0 +1,7 @@
+nest.local.install=saker.nest.support.main.local.install.LocalInstallTaskFactory
+nest.server.upload=saker.nest.support.main.server.upload.ServerUploadTaskFactory
+nest.bundle.download=saker.nest.support.main.download.DownloadBundleTaskFactory
+nest.bundle.localize=saker.nest.support.main.localize.LocalizeBundleTaskFactory
+nest.dependency.resolve=saker.nest.support.main.dependency.ResolveBundleDependencyTaskFactory
+nest.dependency.filter.kind=saker.nest.support.main.dependency.filter.KindDependencyFilterTaskFactory
+nest.dependency.filter.compile=saker.nest.support.main.dependency.filter.CompileDependencyFilterTaskFactory

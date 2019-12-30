@@ -1,0 +1,14 @@
+download(){
+	nest.bundle.download(simple.bundle-v1)
+}
+resolvedownload(){
+	nest.bundle.download(nest.dependency.resolve(simple.bundle, Filter: nest.dependency.filter.kind(classpath)))
+}
+listdownload(){
+	nest.bundle.download([simple.bundle-v1, dep.bundle-v1])
+}
+bundlepathsout(
+	out paths,
+){
+	$paths = nest.bundle.download([simple.bundle-v1, dep.bundle-v1])[BundlePaths]
+}

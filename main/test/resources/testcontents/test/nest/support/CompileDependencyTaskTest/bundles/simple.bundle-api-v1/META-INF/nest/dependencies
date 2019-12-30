@@ -1,0 +1,3 @@
+simple.bundle-impl
+	classpath: [this]
+		compile-transitive: false

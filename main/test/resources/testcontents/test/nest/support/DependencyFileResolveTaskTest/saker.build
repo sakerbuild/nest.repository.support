@@ -1,0 +1,10 @@
+test(
+	out output,
+) {
+	$output = nest.dependency.resolve(DependencyFile: dependencies, Filter: nest.dependency.filter.kind(classpath))[Bundles]
+}
+pinnedtest(
+	out output,
+) {
+	$output = nest.dependency.resolve(DependencyFile: dependencies, Bundles: dep.bundle-v1, Filter: nest.dependency.filter.kind(classpath))[Bundles]
+}

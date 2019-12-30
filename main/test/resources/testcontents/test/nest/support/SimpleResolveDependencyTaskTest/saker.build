@@ -1,0 +1,10 @@
+test(
+	out output,
+) {
+	$output = nest.dependency.resolve(simple.bundle-v1, Filter: nest.dependency.filter.kind(classpath))[Bundles]
+}
+resolveversiononly(
+	out output,
+){
+	$output = nest.dependency.resolve(simple.bundle, Filter: nest.dependency.filter.kind([]))[Bundles]
+}

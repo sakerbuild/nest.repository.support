@@ -1,0 +1,10 @@
+test(
+	out output,
+) {
+	$output = nest.dependency.resolve(simple.bundle-v1, Filter: nest.dependency.filter.compile())[Bundles]
+}
+nontransitive(
+	out output,
+) {
+	$output = nest.dependency.resolve(simple.bundle-v1, Filter: nest.dependency.filter.compile(CompileTransitive: false))[Bundles]
+}
