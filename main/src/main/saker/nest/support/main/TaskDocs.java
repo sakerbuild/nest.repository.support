@@ -91,6 +91,7 @@ public class TaskDocs {
 	@NestFieldInformation(value = "BundleIdentifier",
 			type = @NestTypeUsage(DocBundleIdentifier.class),
 			info = @NestInformation("The bundle identifier of the localized bundle."))
+	@NestInformation("Output of a bundle localizing worker task.")
 	public static class DocLocalizeWorkerTaskOutput {
 	}
 
@@ -122,6 +123,7 @@ public class TaskDocs {
 			type = @NestTypeUsage(String.class),
 			info = @NestInformation("The hash of the installed bundle in hexa encoded format.\n"
 					+ "The hash algorithm is the same as the repository uses for internal representation. (Implementation dependent.)"))
+	@NestInformation("Output of a bundle installing worker task.")
 	public static class DocInstallWorkerTaskOutput {
 	}
 
@@ -143,6 +145,7 @@ public class TaskDocs {
 	@NestFieldInformation(value = "SHA256",
 			type = @NestTypeUsage(String.class),
 			info = @NestInformation("The SHA256 hash of the uploaded bundle in hexa encoded format."))
+	@NestInformation("Output of a bundle upload worker task.")
 	public static class DocBundleUploadWorkerTaskOutput {
 	}
 }
