@@ -19,7 +19,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -81,6 +83,8 @@ abstract class ResolveDependencyWorkerTaskFactoryBase
 		BundleLookup bundlelookup = storageconfig.getBundleLookup();
 		BundleKey rootbundlekey = BundleKey.create(null, rootbundleid);
 
+		List<Throwable> unsatisfiedsuppressions = new ArrayList<>();
+
 		DependencyResolutionResult<BundleKey, DependencyResolutionBundleContext> resolutionresult = DependencyUtils
 				.<BundleKey, DependencyResolutionBundleContext>satisfyDependencyRequirements(rootbundlekey, null,
 						depinfo,
@@ -136,12 +140,16 @@ abstract class ResolveDependencyWorkerTaskFactoryBase
 								return filterBundleDependencyInformation(bk, constraints, this.filter,
 										lookupbundledepinfo);
 							} catch (BundleLoadingFailedException e) {
+								unsatisfiedsuppressions.add(e);
 							}
 							return null;
 						}, null);
 		if (resolutionresult == null) {
 			//XXX more information
-			taskcontext.abortExecution(new BundleDependencyUnsatisfiedException("Failed to satisfy dependencies."));
+			BundleDependencyUnsatisfiedException unsatisfiedexc = new BundleDependencyUnsatisfiedException(
+					"Failed to satisfy dependencies.");
+			unsatisfiedsuppressions.forEach(unsatisfiedexc::addSuppressed);
+			taskcontext.abortExecution(unsatisfiedexc);
 			return null;
 		}
 		Set<BundleKey> bundleresolutions = new LinkedHashSet<>();
