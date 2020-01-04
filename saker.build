@@ -114,6 +114,10 @@ export(
 				],
 				Resources: **/*.java,
 			},
+			{
+				Files: LICENSE,
+				TargetDirectory: META-INF,
+			}
 		],
 		Manifest: {
 			MainAttributes: {
