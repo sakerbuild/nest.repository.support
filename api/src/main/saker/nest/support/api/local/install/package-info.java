@@ -19,3 +19,5 @@
  * @see LocalBundleStorageView
  */
 package saker.nest.support.api.local.install;
+
+import saker.nest.bundle.storage.LocalBundleStorageView;
