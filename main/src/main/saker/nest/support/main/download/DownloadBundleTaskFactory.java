@@ -32,8 +32,6 @@ import saker.build.task.utils.StructuredTaskResult;
 import saker.build.task.utils.annot.SakerInput;
 import saker.build.thirdparty.saker.util.ImmutableUtils;
 import saker.build.thirdparty.saker.util.io.IOUtils;
-import saker.build.thirdparty.saker.util.thread.ThreadUtils;
-import saker.build.thirdparty.saker.util.thread.ThreadUtils.ThreadWorkPool;
 import saker.build.util.data.DataConverterUtils;
 import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.BundleKey;
@@ -88,18 +86,10 @@ public class DownloadBundleTaskFactory extends FrontendTaskFactory<Object> {
 						StructuredListTaskResult bundlesstructuredlist = (StructuredListTaskResult) bundles;
 						Iterator<? extends StructuredTaskResult> it = bundlesstructuredlist.resultIterator();
 						List<TaskIdentifier> bundlepaths = new ArrayList<>();
-						if (it.hasNext()) {
-							try (ThreadWorkPool workpool = ThreadUtils.newDynamicWorkPool()) {
-								do {
-									StructuredTaskResult taskres = it.next();
-									workpool.offer(() -> {
-										TaskIdentifier dltaskid = handleBundleObject(taskcontext, taskres);
-										synchronized (bundlepaths) {
-											bundlepaths.add(dltaskid);
-										}
-									});
-								} while (it.hasNext());
-							}
+						while (it.hasNext()) {
+							Object taskres = it.next().toResult(taskcontext);
+							TaskIdentifier dltaskid = handleBundleObject(taskcontext, taskres);
+							bundlepaths.add(dltaskid);
 						}
 						return NestSupportImpl.createBundleDownloadTaskOutput(bundlepaths);
 					}
@@ -112,12 +102,16 @@ public class DownloadBundleTaskFactory extends FrontendTaskFactory<Object> {
 				if (bundles instanceof Iterable<?>) {
 					Iterable<?> bundlesiterable = (Iterable<?>) bundles;
 					List<TaskIdentifier> bundlepaths = new ArrayList<>();
-					ThreadUtils.runParallelItems(bundlesiterable, o -> {
-						TaskIdentifier dltaskid = handleBundleObject(taskcontext, o);
-						synchronized (bundlepaths) {
-							bundlepaths.add(dltaskid);
+					for (Object o : bundlesiterable) {
+						if (o == null) {
+							continue;
 						}
-					});
+						if (o instanceof StructuredTaskResult) {
+							o = ((StructuredTaskResult) o).toResult(taskcontext);
+						}
+						TaskIdentifier dltaskid = handleBundleObject(taskcontext, o);
+						bundlepaths.add(dltaskid);
+					}
 					return NestSupportImpl.createBundleDownloadTaskOutput(bundlepaths);
 				}
 
@@ -127,12 +121,10 @@ public class DownloadBundleTaskFactory extends FrontendTaskFactory<Object> {
 					if (adapted instanceof DependencyResolutionTaskOutput) {
 						DependencyResolutionTaskOutput depoutput = (DependencyResolutionTaskOutput) adapted;
 						List<TaskIdentifier> bundlepaths = new ArrayList<>();
-						ThreadUtils.runParallelItems(depoutput.getBundles(), bundlekey -> {
+						for (BundleKey bundlekey : depoutput.getBundles()) {
 							TaskIdentifier dltaskid = handleBundleObject(taskcontext, bundlekey);
-							synchronized (bundlepaths) {
-								bundlepaths.add(dltaskid);
-							}
-						});
+							bundlepaths.add(dltaskid);
+						}
 						return NestSupportImpl.createBundleDownloadTaskOutput(bundlepaths);
 					}
 					if (adapted instanceof LocalizeBundleTaskOutput) {
@@ -140,21 +132,13 @@ public class DownloadBundleTaskFactory extends FrontendTaskFactory<Object> {
 						StructuredListTaskResult bundlesstructuredlist = locoutput.getLocalizeResults();
 						Iterator<? extends StructuredTaskResult> it = bundlesstructuredlist.resultIterator();
 						List<TaskIdentifier> bundlepaths = new ArrayList<>();
-						if (it.hasNext()) {
-							try (ThreadWorkPool workpool = ThreadUtils.newDynamicWorkPool()) {
-								do {
-									StructuredTaskResult taskres = it.next();
-									workpool.offer(() -> {
-										LocalizeBundleWorkerTaskOutput bundlelocalizeworkerout = (LocalizeBundleWorkerTaskOutput) taskres
-												.toResult(taskcontext);
-										TaskIdentifier dltaskid = handleBundleObject(taskcontext,
-												bundlelocalizeworkerout.getBundleKey());
-										synchronized (bundlepaths) {
-											bundlepaths.add(dltaskid);
-										}
-									});
-								} while (it.hasNext());
-							}
+						while (it.hasNext()) {
+							StructuredTaskResult taskres = it.next();
+							LocalizeBundleWorkerTaskOutput bundlelocalizeworkerout = (LocalizeBundleWorkerTaskOutput) taskres
+									.toResult(taskcontext);
+							TaskIdentifier dltaskid = handleBundleObject(taskcontext,
+									bundlelocalizeworkerout.getBundleKey());
+							bundlepaths.add(dltaskid);
 						}
 						return NestSupportImpl.createBundleDownloadTaskOutput(bundlepaths);
 					}
