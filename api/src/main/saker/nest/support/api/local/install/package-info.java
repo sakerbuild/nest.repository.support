@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * Contains classes related to Nest bundle installation to the local bundle storage.
+ * Contains classes related to saker.nest bundle installation to the local bundle storage.
  * 
  * @see LocalBundleStorageView
  */

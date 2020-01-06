@@ -34,7 +34,7 @@ public class TaskDocs {
 	}
 
 	@NestTypeInformation(qualifiedName = "saker.nest.bundle.BundleKey")
-	@NestInformation("An unique identifier object for a Nest bundle for the current storage configuration.\n"
+	@NestInformation("An unique identifier object for a saker.nest bundle for the current storage configuration.\n"
 			+ "The object uniquely identifies a bundle that is available in the current repository storage configuration. "
 			+ "It uniquely identifies a bundle even if a bundle identifier is present multiple times in the configuration.\n"
 			+ "This object can be passed to tasks that accept bundle keys as inputs.")

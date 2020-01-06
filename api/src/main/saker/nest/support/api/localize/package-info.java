@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * Contains classes related to localizing Nest bundles.
+ * Contains classes related to localizing saker.nest bundles.
  */
 package saker.nest.support.api.localize;
 

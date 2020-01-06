@@ -50,7 +50,7 @@ import saker.nest.support.main.TaskDocs.DocLocalInstallTaskOutput;
 import saker.nest.utils.FrontendTaskFactory;
 
 @NestTaskInformation(returnType = @NestTypeUsage(DocLocalInstallTaskOutput.class))
-@NestInformation("Installs the specified Nest bundles to the specfied local bundle storage.\n"
+@NestInformation("Installs the specified saker.nest bundles to the specfied local bundle storage.\n"
 		+ "The task will install the specified bundles to the local bundle storage of the repository configuration.\n"
 		+ "The bundle installation will have no effect on the current build execution. Any contained tasks will be visible only "
 		+ "in the next execution.\n"

@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * Contains classes related to Nest bundle downloading for build execution. 
+ * Contains classes related to saker.nest bundle downloading for build execution. 
  */
 package saker.nest.support.api.download;
 

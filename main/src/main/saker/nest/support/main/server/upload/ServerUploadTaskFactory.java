@@ -50,8 +50,8 @@ import saker.nest.support.main.TaskDocs.DocBundleUploadTaskOutput;
 import saker.nest.utils.FrontendTaskFactory;
 
 @NestTaskInformation(returnType = @NestTypeUsage(DocBundleUploadTaskOutput.class))
-@NestInformation("Uploads Nest bundles to the specified Nest server.\n"
-		+ "The task takes Nest bundle paths as its input, and upload them to the specified server.\n"
+@NestInformation("Uploads saker.nest bundles to the specified Nest server.\n"
+		+ "The task takes saker.nest bundle paths as its input, and upload them to the specified server.\n"
 		+ "The bundle is uploaded with the permissions granted by the specified APIKey and APISecret.\n"
 		+ "Note that this task is NOT incremental. Every time it is invoked, the specified bundles will be uploaded "
 		+ "to the server. Make sure to specify bundle upload tasks in a different build target than the usually used "

@@ -50,7 +50,7 @@ import saker.nest.support.main.dependency.filter.KindDependencyFilterTaskFactory
 import saker.nest.utils.FrontendTaskFactory;
 
 @NestTaskInformation(returnType = @NestTypeUsage(DocDependencyResolutionTaskOutput.class))
-@NestInformation("Resolves Nest bundle dependencies.\n"
+@NestInformation("Resolves saker.nest bundle dependencies.\n"
 		+ "The task will execute the dependency resolution of the Nest repository for the given parameters.\n"
 		+ "It will return the resolved bundle references. The callers are likely to pass it to another task that "
 		+ "converts it to an usable input for other tasks. (E.g. classpath, downloading, etc...)\n"
@@ -67,7 +67,7 @@ import saker.nest.utils.FrontendTaskFactory;
 				+ "in the file. This parameter can also be used to pin bundles when a version numbers are specified."))
 @NestParameterInformation(value = "DependencyFile",
 		type = @NestTypeUsage(SakerPath.class),
-		info = @NestInformation("Path to a Nest bundle dependency file from which the dependencies should be resolved.\n"
+		info = @NestInformation("Path to a saker.nest bundle dependency file from which the dependencies should be resolved.\n"
 				+ "The argument is a path to a file present in Nest repository bundles, which describe the dependencies of an "
 				+ "associated bundle. (Entry " + BundleInformation.ENTRY_BUNDLE_DEPENDENCIES + ")\n"
 				+ "The file will be parsed and the declared dependencies are resolved with the specified dependency Kinds.\n"

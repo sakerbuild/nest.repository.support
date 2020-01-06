@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * Contains classes related to Nest bundle uploading to the server bundle storage.
+ * Contains classes related to saker.nest bundle uploading to the server bundle storage.
  * 
  * @see ServerBundleStorageView
  */
