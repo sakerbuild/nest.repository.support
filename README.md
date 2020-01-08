@@ -1,5 +1,7 @@
 # nest.repository.support
 
+![Build status](https://img.shields.io/azure-devops/build/sakerbuild/d19fd1c7-3c53-4de7-9152-ba2eb0e8979c/8/master)
+
 Build tasks and support classes for working with the [saker.nest repository](https://github.com/sakerbuild/saker.nest) in the [saker.build system](https://saker.build). The project implements build tasks that allow managing saker.nest bundles and provides common classes that other package authors can use for representing bundles.
 
 See the [documentation](https://saker.build/nest.repository.support/doc/) for more information.
