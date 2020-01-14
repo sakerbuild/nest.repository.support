@@ -30,19 +30,20 @@ import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
 import saker.nest.scriptinfo.reflection.annot.NestTaskInformation;
 import saker.nest.scriptinfo.reflection.annot.NestTypeUsage;
 import saker.nest.support.api.dependency.filter.DependencyFilter;
-import saker.nest.support.impl.dependency.filter.ClasspathDependencyFilter;
+import saker.nest.support.impl.dependency.filter.CompileDependencyFilter;
 import saker.nest.support.main.TaskDocs.DocDependencyFilter;
 import saker.nest.support.main.dependency.ResolveBundleDependencyTaskFactory;
 import saker.nest.utils.FrontendTaskFactory;
 
 @NestTaskInformation(returnType = @NestTypeUsage(DocDependencyFilter.class))
 @NestInformation("Gets a dependency filter that limits the dependencies to the specified kinds and " + "based on the "
-		+ ClasspathDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE + " meta-data.\n"
+		+ CompileDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE + " meta-data.\n"
 		+ "The task creates a dependency filter that filters out dependencies that aren't declared with "
 		+ "any of the configured dependency kinds.\n"
 		+ "If the CompileTransitive parameter is set to false, the task will also filter out the dependencies that are "
-		+ "declared with the " + ClasspathDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE + ": false meta-data.\n"
-		+ "The task result can be used with the " + ResolveBundleDependencyTaskFactory.TASK_NAME + "() task.\n"
+		+ "declared with the " + CompileDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE + ": false meta-data.\n"
+		+ "The filter will also remove the private dependencies.\n " + "The task result can be used with the "
+		+ ResolveBundleDependencyTaskFactory.TASK_NAME + "() task.\n"
 		+ "Note that if the CompileTransitive parameter is not set to false, the dependency filter works the same way "
 		+ "as if the " + KindDependencyFilterTaskFactory.TASK_NAME + "() task was used.")
 @NestParameterInformation(value = "Kinds",
@@ -56,10 +57,10 @@ import saker.nest.utils.FrontendTaskFactory;
 @NestParameterInformation(value = "CompileTransitive",
 		type = @NestTypeUsage(boolean.class),
 		info = @NestInformation("Specifies whether or not "
-				+ ClasspathDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE + " dependencies should be included.\n"
+				+ CompileDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE + " dependencies should be included.\n"
 				+ "The default is true.\n"
 				+ "If this parameter is set to false, then any transitive dependency that is declared with the "
-				+ ClasspathDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE
+				+ CompileDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE
 				+ ": false meta-data will be filtered out."))
 public class CompileDependencyFilterTaskFactory extends FrontendTaskFactory<DependencyFilter> {
 	private static final long serialVersionUID = 1L;
@@ -80,9 +81,9 @@ public class CompileDependencyFilterTaskFactory extends FrontendTaskFactory<Depe
 			public DependencyFilter run(TaskContext taskcontext) throws Exception {
 				NavigableSet<String> kindsset = ImmutableUtils.makeImmutableNavigableSet(kindsOption);
 				if (compileTransitiveOption) {
-					return ClasspathDependencyFilter.createTransitive(kindsset);
+					return CompileDependencyFilter.createTransitive(kindsset);
 				}
-				return ClasspathDependencyFilter.createNonTransitive(kindsset);
+				return CompileDependencyFilter.createNonTransitive(kindsset);
 			}
 		};
 	}
