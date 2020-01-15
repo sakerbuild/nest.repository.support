@@ -49,8 +49,9 @@ import saker.nest.exc.BundleDependencyUnsatisfiedException;
 import saker.nest.exc.BundleLoadingFailedException;
 import saker.nest.support.api.dependency.DependencyResolutionTaskOutput;
 import saker.nest.support.api.dependency.filter.DependencyFilter;
-import saker.nest.support.impl.dependency.BundleVersionsLookupExecutionProperty.PropertyLookupResult;
 import saker.nest.support.impl.dependency.filter.ConstraintDependencyFilter;
+import saker.nest.support.impl.util.BundleVersionsLookupExecutionProperty;
+import saker.nest.support.impl.util.BundleVersionsLookupExecutionProperty.PropertyLookupResult;
 
 abstract class ResolveDependencyWorkerTaskFactoryBase
 		implements TaskFactory<DependencyResolutionTaskOutput>, Task<DependencyResolutionTaskOutput>, Externalizable {
