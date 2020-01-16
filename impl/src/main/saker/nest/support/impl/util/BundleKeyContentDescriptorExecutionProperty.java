@@ -126,8 +126,11 @@ public class BundleKeyContentDescriptorExecutionProperty
 			throw new IllegalArgumentException("Storage view not found: " + bundleKey.getStorageViewKey());
 		}
 		NestRepositoryBundle bundle = storageview.getBundle(bundleKey.getBundleIdentifier());
-		byte[] hash = bundle.getHash();
-		return new PropertyResult(bundle, createContentDescriptorForBundleHash(hash));
+		return new PropertyResult(bundle, createContentDescriptorForBundle(bundle));
+	}
+
+	public static ContentDescriptor createContentDescriptorForBundle(NestRepositoryBundle bundle) {
+		return createContentDescriptorForBundleHash(bundle.getHash());
 	}
 
 	public static ContentDescriptor createContentDescriptorForBundleHash(byte[] hash) {

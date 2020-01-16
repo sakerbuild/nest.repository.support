@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -43,10 +44,11 @@ import saker.nest.bundle.lookup.BundleLookup;
 import saker.nest.bundle.lookup.BundleVersionLookupResult;
 import saker.nest.bundle.storage.BundleStorageView;
 import saker.nest.bundle.storage.StorageViewKey;
-import saker.nest.dependency.DependencyResolutionResult;
+import saker.nest.dependency.DependencyDomainResolutionResult;
 import saker.nest.dependency.DependencyUtils;
 import saker.nest.exc.BundleDependencyUnsatisfiedException;
 import saker.nest.exc.BundleLoadingFailedException;
+import saker.nest.meta.Versions;
 import saker.nest.support.api.dependency.DependencyResolutionTaskOutput;
 import saker.nest.support.api.dependency.filter.DependencyFilter;
 import saker.nest.support.impl.dependency.filter.ConstraintDependencyFilter;
@@ -84,67 +86,128 @@ abstract class ResolveDependencyWorkerTaskFactoryBase
 		BundleLookup bundlelookup = storageconfig.getBundleLookup();
 		BundleKey rootbundlekey = BundleKey.create(null, rootbundleid);
 
+		return executeDependencyResolution(taskcontext, depinfo, bundlelookup, rootbundlekey);
+	}
+
+	private DependencyResolutionTaskOutput executeDependencyResolution(TaskContext taskcontext,
+			BundleDependencyInformation depinfo, BundleLookup bundlelookup, BundleKey rootbundlekey) {
 		List<Throwable> unsatisfiedsuppressions = new ArrayList<>();
 
-		DependencyResolutionResult<BundleKey, DependencyResolutionBundleContext> resolutionresult = DependencyUtils
+		BiFunction<BundleIdentifier, DependencyResolutionBundleContext, Iterable<? extends Entry<? extends BundleKey, ? extends DependencyResolutionBundleContext>>> bundleslookupfunction = new BiFunction<BundleIdentifier, DependencyResolutionBundleContext, Iterable<? extends Entry<? extends BundleKey, ? extends DependencyResolutionBundleContext>>>() {
+			private boolean rootReported = false;
+
+			@Override
+			public Iterable<? extends Entry<? extends BundleKey, ? extends DependencyResolutionBundleContext>> apply(
+					BundleIdentifier bi, DependencyResolutionBundleContext bc) {
+				BundleLookup lookuptouse;
+				if (bc == null) {
+					if (!rootReported) {
+						taskcontext.reportExecutionDependency(RootBundleLookupKeyExecutionProperty.INSTANCE,
+								bundlelookup.getLookupKey());
+						rootReported = true;
+					}
+					lookuptouse = bundlelookup;
+				} else {
+					lookuptouse = bc.getRelativeLookup();
+				}
+				PropertyLookupResult propertylookup = taskcontext.getTaskUtilities()
+						.getReportExecutionDependency(new BundleVersionsLookupExecutionProperty(lookuptouse, bi));
+				if (propertylookup == null) {
+					return null;
+				}
+				BundleVersionLookupResult lookupresult = propertylookup.getLookupResult();
+
+				if (lookupresult == null) {
+					return null;
+				}
+				return ObjectUtils.singleValueMap(toBundleKeySet(lookupresult),
+						new DependencyResolutionBundleContext(lookupresult)).entrySet();
+			}
+		};
+		BiFunction<? super BundleKey, ? super DependencyResolutionBundleContext, ? extends BundleDependencyInformation> bundledependencieslookupfunction = (
+				bk, bc) -> {
+			try {
+				BundleStorageView storageview = bc.getStorageView();
+				BundleIdentifier bundleid = bk.getBundleIdentifier();
+				BundleInformation lookupbundleinfo = storageview.getBundleInformation(bundleid);
+				taskcontext.reportExecutionDependency(new BundleInformationExecutionProperty(storageview, bundleid),
+						lookupbundleinfo);
+
+				DependencyConstraintConfiguration constraints = this.constraints;
+				if (DependencyUtils.isDependencyConstraintClassPathExcludes(constraints, lookupbundleinfo)) {
+					//XXX log somewhere?
+					return null;
+				}
+				BundleDependencyInformation lookupbundledepinfo = lookupbundleinfo.getDependencyInformation();
+				return filterBundleDependencyInformation(bk, constraints, this.filter, lookupbundledepinfo);
+			} catch (BundleLoadingFailedException e) {
+				unsatisfiedsuppressions.add(e);
+			}
+			return null;
+		};
+
+		if (Versions.VERSION_MAJOR == 0 && Versions.VERSION_MINOR <= 8 && Versions.VERSION_PATCH < 1) {
+			//domain based dependency resolution is not yet available
+			//use legacy
+			return executeLegacyDependencyResolution(taskcontext, depinfo, rootbundlekey, bundleslookupfunction,
+					bundledependencieslookupfunction, unsatisfiedsuppressions);
+		}
+		return executeDomainDependencyResolution(taskcontext, depinfo, rootbundlekey, bundleslookupfunction,
+				bundledependencieslookupfunction, unsatisfiedsuppressions);
+	}
+
+	private static DependencyResolutionTaskOutput executeDomainDependencyResolution(TaskContext taskcontext,
+			BundleDependencyInformation depinfo, BundleKey rootbundlekey,
+			BiFunction<BundleIdentifier, DependencyResolutionBundleContext, Iterable<? extends Entry<? extends BundleKey, ? extends DependencyResolutionBundleContext>>> bundleslookupfunction,
+			BiFunction<? super BundleKey, ? super DependencyResolutionBundleContext, ? extends BundleDependencyInformation> bundledependencieslookupfunction,
+			List<Throwable> unsatisfiedsuppressions) {
+		DependencyDomainResolutionResult<BundleKey, DependencyResolutionBundleContext> resolutionresult = DependencyUtils
+				.<BundleKey, DependencyResolutionBundleContext>satisfyDependencyDomain(rootbundlekey, null, depinfo,
+						bundleslookupfunction, bundledependencieslookupfunction, null);
+		if (resolutionresult == null) {
+			//XXX more information
+			BundleDependencyUnsatisfiedException unsatisfiedexc = new BundleDependencyUnsatisfiedException(
+					"Failed to satisfy dependencies.");
+			unsatisfiedsuppressions.forEach(unsatisfiedexc::addSuppressed);
+			taskcontext.abortExecution(unsatisfiedexc);
+			return null;
+		}
+		Set<BundleKey> bundleresolutions = new LinkedHashSet<>();
+		collectBundleResolutions(resolutionresult, bundleresolutions, new HashSet<>());
+		//don't include the root container bundle in the result
+		bundleresolutions.remove(rootbundlekey);
+		DependencyResolutionTaskOutputImpl result = new DependencyResolutionTaskOutputImpl(bundleresolutions);
+		taskcontext.reportSelfTaskOutputChangeDetector(new EqualityTaskOutputChangeDetector(result));
+		return result;
+	}
+
+	private static void collectBundleResolutions(DependencyDomainResolutionResult<BundleKey, ?> domain,
+			Set<BundleKey> result, Set<DependencyDomainResolutionResult<BundleKey, ?>> collected) {
+		if (!collected.add(domain)) {
+			return;
+		}
+		//add first and collect later for order
+		for (Entry<? extends Entry<? extends BundleKey, ?>, ? extends DependencyDomainResolutionResult<BundleKey, ?>> entry : domain
+				.getDirectDependencies().entrySet()) {
+			result.add(entry.getKey().getKey());
+		}
+		for (Entry<? extends Entry<? extends BundleKey, ?>, ? extends DependencyDomainResolutionResult<BundleKey, ?>> entry : domain
+				.getDirectDependencies().entrySet()) {
+			collectBundleResolutions(entry.getValue(), result, collected);
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private static DependencyResolutionTaskOutput executeLegacyDependencyResolution(TaskContext taskcontext,
+			BundleDependencyInformation depinfo, BundleKey rootbundlekey,
+			BiFunction<BundleIdentifier, DependencyResolutionBundleContext, Iterable<? extends Entry<? extends BundleKey, ? extends DependencyResolutionBundleContext>>> bundleslookupfunction,
+			BiFunction<? super BundleKey, ? super DependencyResolutionBundleContext, ? extends BundleDependencyInformation> bundledependencieslookupfunction,
+			List<Throwable> unsatisfiedsuppressions) {
+
+		//use fully qualified name to avoid importing and having a warning there
+		saker.nest.dependency.DependencyResolutionResult<BundleKey, DependencyResolutionBundleContext> resolutionresult = DependencyUtils
 				.<BundleKey, DependencyResolutionBundleContext>satisfyDependencyRequirements(rootbundlekey, null,
-						depinfo,
-						new BiFunction<BundleIdentifier, DependencyResolutionBundleContext, Iterable<? extends Entry<? extends BundleKey, ? extends DependencyResolutionBundleContext>>>() {
-							private boolean rootReported = false;
-
-							@Override
-							public Iterable<? extends Entry<? extends BundleKey, ? extends DependencyResolutionBundleContext>> apply(
-									BundleIdentifier bi, DependencyResolutionBundleContext bc) {
-								BundleLookup lookuptouse;
-								if (bc == null) {
-									if (!rootReported) {
-										taskcontext.reportExecutionDependency(
-												RootBundleLookupKeyExecutionProperty.INSTANCE,
-												bundlelookup.getLookupKey());
-										rootReported = true;
-									}
-									lookuptouse = bundlelookup;
-								} else {
-									lookuptouse = bc.getRelativeLookup();
-								}
-								PropertyLookupResult propertylookup = taskcontext.getTaskUtilities()
-										.getReportExecutionDependency(
-												new BundleVersionsLookupExecutionProperty(lookuptouse, bi));
-								if (propertylookup == null) {
-									return null;
-								}
-								BundleVersionLookupResult lookupresult = propertylookup.getLookupResult();
-
-								if (lookupresult == null) {
-									return null;
-								}
-								return ObjectUtils.singleValueMap(toBundleKeySet(lookupresult),
-										new DependencyResolutionBundleContext(lookupresult)).entrySet();
-							}
-						}, (bk, bc) -> {
-							try {
-								BundleStorageView storageview = bc.getStorageView();
-								BundleIdentifier bundleid = bk.getBundleIdentifier();
-								BundleInformation lookupbundleinfo = storageview.getBundleInformation(bundleid);
-								taskcontext.reportExecutionDependency(
-										new BundleInformationExecutionProperty(storageview, bundleid),
-										lookupbundleinfo);
-
-								DependencyConstraintConfiguration constraints = this.constraints;
-								if (DependencyUtils.isDependencyConstraintClassPathExcludes(constraints,
-										lookupbundleinfo)) {
-									//XXX log somewhere?
-									return null;
-								}
-								BundleDependencyInformation lookupbundledepinfo = lookupbundleinfo
-										.getDependencyInformation();
-								return filterBundleDependencyInformation(bk, constraints, this.filter,
-										lookupbundledepinfo);
-							} catch (BundleLoadingFailedException e) {
-								unsatisfiedsuppressions.add(e);
-							}
-							return null;
-						}, null);
+						depinfo, bundleslookupfunction, bundledependencieslookupfunction, null);
 		if (resolutionresult == null) {
 			//XXX more information
 			BundleDependencyUnsatisfiedException unsatisfiedexc = new BundleDependencyUnsatisfiedException(

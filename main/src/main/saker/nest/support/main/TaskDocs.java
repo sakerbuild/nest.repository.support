@@ -163,4 +163,15 @@ public class TaskDocs {
 	@NestInformation("Output of a bundle upload worker task.")
 	public static class DocBundleUploadWorkerTaskOutput {
 	}
+
+	@NestTypeInformation(qualifiedName = "saker.build.file.path.SakerPath")
+	@NestInformation("Execution path to the archive with additional saker.nest test instrumentation.")
+	public static class DocInstrumentedArchivePath {
+	}
+
+	@NestTypeInformation(qualifiedName = "java.lang.String")
+	@NestInformation("A version number.")
+	public static class DocVersionNumber {
+
+	}
 }

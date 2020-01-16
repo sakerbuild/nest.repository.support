@@ -34,6 +34,8 @@ import saker.nest.support.api.property.BundleContentDescriptorPathPropertyValue;
 
 public class BundleKeyContentDescriptorPathExecutionProperty
 		implements ExecutionProperty<BundleContentDescriptorPathPropertyValue>, Externalizable {
+	private static final long serialVersionUID = 1L;
+
 	public static class PropertyResult implements Externalizable, BundleContentDescriptorPathPropertyValue {
 		private static final long serialVersionUID = 1L;
 
@@ -110,8 +112,6 @@ public class BundleKeyContentDescriptorPathExecutionProperty
 		}
 
 	}
-
-	private static final long serialVersionUID = 1L;
 
 	private BundleKey bundleKey;
 

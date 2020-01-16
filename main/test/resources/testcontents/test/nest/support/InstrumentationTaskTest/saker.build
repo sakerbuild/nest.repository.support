@@ -1,0 +1,15 @@
+build {
+	nest.test.instrument(
+		test.jar,
+	)
+}
+sakerbuild_instrument {
+	$VERSION_saker.build = nest.dependency.resolve(
+		saker.build,
+		Filters: nest.dependency.filter.kind([]),
+	)[Bundles][0][BundleIdentifier][VersionNumber]
+	nest.test.instrument(
+		nest.bundle.download("saker.build-v{ $VERSION_saker.build }")[BundlePaths][0],
+		Output: saker.build_instrument.jar
+	)
+}

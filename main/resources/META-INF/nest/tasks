@@ -5,3 +5,4 @@ nest.bundle.localize=saker.nest.support.main.localize.LocalizeBundleTaskFactory
 nest.dependency.resolve=saker.nest.support.main.dependency.ResolveBundleDependencyTaskFactory
 nest.dependency.filter.kind=saker.nest.support.main.dependency.filter.KindDependencyFilterTaskFactory
 nest.dependency.filter.compile=saker.nest.support.main.dependency.filter.CompileDependencyFilterTaskFactory
+nest.test.instrument=saker.nest.support.main.testing.TestInstrumentTaskFactory

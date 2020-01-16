@@ -1,4 +1,4 @@
-global(VERSION_nest.repository.support) = "0.8.0"
+global(VERSION_nest.repository.support) = "0.8.1"
 
 static(VERSION_saker.build) = nest.dependency.resolve(
 	saker.build,
@@ -185,6 +185,10 @@ test() {
 				RepositoryJarPath: nest.bundle.localize("saker.nest-test-v{ static(VERSION_saker.nest) }")[BundleLocalPaths][0],
 				RepositoryParameterBundles: "{ 
 						foreach $path in $export[bundlepaths]: "{ std.file.mirror($path) };" 
+					};{ 
+						nest.bundle.localize("saker.nest-test-instrumentation-v{ static(VERSION_saker.nest) }")[BundleLocalPaths][0] 
+					};{
+						nest.bundle.localize("saker.build-v{ static(VERSION_saker.build) }")[BundleLocalPaths][0]
 					}",
 			}
 		},
