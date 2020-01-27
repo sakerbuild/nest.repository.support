@@ -23,6 +23,7 @@ import saker.build.runtime.execution.ExecutionContext;
 import saker.build.task.ParameterizableTask;
 import saker.build.task.TaskContext;
 import saker.build.task.utils.annot.SakerInput;
+import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.ImmutableUtils;
 import saker.nest.bundle.BundleInformation;
 import saker.nest.scriptinfo.reflection.annot.NestInformation;
@@ -56,9 +57,8 @@ import saker.nest.utils.FrontendTaskFactory;
 				+ "If not specified, the default dependency kind is classpath."))
 @NestParameterInformation(value = "CompileTransitive",
 		type = @NestTypeUsage(boolean.class),
-		info = @NestInformation("Specifies whether or not "
-				+ CompileDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE + " dependencies should be included.\n"
-				+ "The default is true.\n"
+		info = @NestInformation("Specifies whether or not " + CompileDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE
+				+ " dependencies should be included.\n" + "The default is true.\n"
 				+ "If this parameter is set to false, then any transitive dependency that is declared with the "
 				+ CompileDependencyFilter.DEPENDENCY_META_COMPILE_TRANSITIVE
 				+ ": false meta-data will be filtered out."))
@@ -80,10 +80,14 @@ public class CompileDependencyFilterTaskFactory extends FrontendTaskFactory<Depe
 			@Override
 			public DependencyFilter run(TaskContext taskcontext) throws Exception {
 				NavigableSet<String> kindsset = ImmutableUtils.makeImmutableNavigableSet(kindsOption);
+				DependencyFilter result;
 				if (compileTransitiveOption) {
-					return CompileDependencyFilter.createTransitive(kindsset);
+					result = CompileDependencyFilter.createTransitive(kindsset);
+				} else {
+					result = CompileDependencyFilter.createNonTransitive(kindsset);
 				}
-				return CompileDependencyFilter.createNonTransitive(kindsset);
+				taskcontext.reportSelfTaskOutputChangeDetector(new EqualityTaskOutputChangeDetector(result));
+				return result;
 			}
 		};
 	}

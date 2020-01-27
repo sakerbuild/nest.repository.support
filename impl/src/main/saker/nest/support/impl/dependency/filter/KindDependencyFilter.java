@@ -42,9 +42,16 @@ public class KindDependencyFilter implements DependencyFilter, Externalizable {
 	public KindDependencyFilter() {
 	}
 
-	public KindDependencyFilter(NavigableSet<String> dependencyKinds) {
-		Objects.requireNonNull(dependencyKinds, "dependency kinds");
+	private KindDependencyFilter(NavigableSet<String> dependencyKinds) {
 		this.dependencyKinds = dependencyKinds;
+	}
+
+	public static DependencyFilter create(NavigableSet<String> dependencyKinds) {
+		Objects.requireNonNull(dependencyKinds, "dependency kinds");
+		if (dependencyKinds.isEmpty()) {
+			return NoneDependencyFilter.INSTANCE;
+		}
+		return new KindDependencyFilter(dependencyKinds);
 	}
 
 	@Override

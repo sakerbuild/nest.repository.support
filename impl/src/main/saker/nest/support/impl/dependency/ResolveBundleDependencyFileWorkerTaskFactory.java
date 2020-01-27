@@ -153,11 +153,9 @@ public class ResolveBundleDependencyFileWorkerTaskFactory extends ResolveDepende
 		if (getClass() != obj.getClass())
 			return false;
 		ResolveBundleDependencyFileWorkerTaskFactory other = (ResolveBundleDependencyFileWorkerTaskFactory) obj;
-		if (bundleIds == null) {
-			if (other.bundleIds != null)
-				return false;
-		} else if (!bundleIds.equals(other.bundleIds))
+		if (!ObjectUtils.iterablesOrderedEquals(this.bundleIds, other.bundleIds)) {
 			return false;
+		}
 		if (dependencyFilePath == null) {
 			if (other.dependencyFilePath != null)
 				return false;

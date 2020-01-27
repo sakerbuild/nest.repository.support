@@ -56,11 +56,11 @@ public class ChainDependencyFilter implements DependencyFilter, Externalizable {
 			//check just in case
 			return IdentityDependencyFilter.INSTANCE;
 		}
-		if (array.length == 1) {
-			return array[0];
-		}
 		if (ObjectUtils.hasNull((Object[]) array)) {
 			throw new NullPointerException("Null dependency filter element in: " + Arrays.toString(array));
+		}
+		if (array.length == 1) {
+			return array[0];
 		}
 		return new ChainDependencyFilter(array);
 	}

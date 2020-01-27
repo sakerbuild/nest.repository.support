@@ -21,6 +21,7 @@ import saker.build.runtime.execution.ExecutionContext;
 import saker.build.task.ParameterizableTask;
 import saker.build.task.TaskContext;
 import saker.build.task.utils.annot.SakerInput;
+import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.ImmutableUtils;
 import saker.nest.scriptinfo.reflection.annot.NestInformation;
 import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
@@ -60,7 +61,10 @@ public class KindDependencyFilterTaskFactory extends FrontendTaskFactory<Depende
 
 			@Override
 			public DependencyFilter run(TaskContext taskcontext) throws Exception {
-				return new KindDependencyFilter(ImmutableUtils.makeImmutableNavigableSet(kindsOption));
+				DependencyFilter result = KindDependencyFilter
+						.create(ImmutableUtils.makeImmutableNavigableSet(kindsOption));
+				taskcontext.reportSelfTaskOutputChangeDetector(new EqualityTaskOutputChangeDetector(result));
+				return result;
 			}
 		};
 	}
