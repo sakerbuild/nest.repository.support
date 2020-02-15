@@ -32,6 +32,7 @@ import saker.build.task.CommonTaskContentDescriptors;
 import saker.build.task.Task;
 import saker.build.task.TaskContext;
 import saker.build.task.TaskFactory;
+import saker.build.trace.BuildTrace;
 import saker.nest.bundle.BundleKey;
 import saker.nest.bundle.NestRepositoryBundle;
 import saker.nest.support.api.property.BundleContentDescriptorPropertyValue;
@@ -64,6 +65,11 @@ public class TestInstrumentWorkerTaskFactory implements TaskFactory<SakerPath>, 
 
 	@Override
 	public SakerPath run(TaskContext taskcontext) throws Exception {
+		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
+		}
+		taskcontext.setStandardOutDisplayIdentifier(TestInstrumentTaskFactory.TASK_NAME);
+
 		SakerFile archivefile = taskcontext.getTaskUtilities().resolveFileAtPath(archive);
 		if (archivefile == null) {
 			taskcontext.reportInputFileDependency(null, archive, CommonTaskContentDescriptors.IS_NOT_FILE);

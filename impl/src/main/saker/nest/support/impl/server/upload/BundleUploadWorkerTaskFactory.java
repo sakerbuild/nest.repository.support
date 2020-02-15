@@ -34,6 +34,7 @@ import saker.build.task.Task;
 import saker.build.task.TaskContext;
 import saker.build.task.TaskFactory;
 import saker.build.thirdparty.saker.util.StringUtils;
+import saker.build.trace.BuildTrace;
 import saker.build.util.property.BuildTimeExecutionProperty;
 import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.BundleInformation;
@@ -70,6 +71,10 @@ public class BundleUploadWorkerTaskFactory
 
 	@Override
 	public BundleUploadWorkerTaskOutput run(TaskContext taskcontext) throws Exception {
+		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
+			BuildTrace.setDisplayInformation("nest.upload:" + bundlePath.getFileName(), null);
+		}
 		taskcontext.setStandardOutDisplayIdentifier(ServerUploadTaskFactory.TASK_NAME);
 
 		SakerFile file = SakerPathFiles.resolveFileAtPath(taskcontext, bundlePath);

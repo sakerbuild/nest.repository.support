@@ -34,6 +34,7 @@ import saker.build.task.TaskContext;
 import saker.build.task.TaskFactory;
 import saker.build.thirdparty.saker.util.ObjectUtils;
 import saker.build.thirdparty.saker.util.StringUtils;
+import saker.build.trace.BuildTrace;
 import saker.nest.bundle.BundleKey;
 import saker.nest.bundle.JarNestRepositoryBundle;
 import saker.nest.bundle.NestRepositoryBundle;
@@ -65,6 +66,12 @@ public class BundleKeyDownloadingWorkerTaskFactory
 
 	@Override
 	public DownloadBundleWorkerTaskOutput run(TaskContext taskcontext) throws Exception {
+		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
+			BuildTrace.setDisplayInformation("nest.download:" + bundleKey.getBundleIdentifier(), null);
+		}
+		taskcontext.setStandardOutDisplayIdentifier(DownloadBundleTaskFactory.TASK_NAME);
+
 		BundleContentDescriptorPropertyValue propertyresult;
 		try {
 			propertyresult = taskcontext.getTaskUtilities()

@@ -32,6 +32,7 @@ import saker.build.task.utils.StructuredTaskResult;
 import saker.build.task.utils.annot.SakerInput;
 import saker.build.thirdparty.saker.util.ImmutableUtils;
 import saker.build.thirdparty.saker.util.io.IOUtils;
+import saker.build.trace.BuildTrace;
 import saker.build.util.data.DataConverterUtils;
 import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.BundleKey;
@@ -80,6 +81,10 @@ public class DownloadBundleTaskFactory extends FrontendTaskFactory<Object> {
 
 			@Override
 			public Object run(TaskContext taskcontext) throws Exception {
+				if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+					BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_FRONTEND);
+				}
+
 				//XXX abort executions where possible instead of throwing
 				if (bundles instanceof StructuredTaskResult) {
 					if (bundles instanceof StructuredListTaskResult) {

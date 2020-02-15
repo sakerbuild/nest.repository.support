@@ -38,6 +38,7 @@ import saker.build.task.utils.annot.SakerInput;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.task.utils.dependencies.WildcardFileCollectionStrategy;
 import saker.build.thirdparty.saker.util.ObjectUtils;
+import saker.build.trace.BuildTrace;
 import saker.nest.scriptinfo.reflection.annot.NestInformation;
 import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
 import saker.nest.scriptinfo.reflection.annot.NestTaskInformation;
@@ -71,6 +72,8 @@ import saker.nest.utils.FrontendTaskFactory;
 public class LocalInstallTaskFactory extends FrontendTaskFactory<Object> {
 	private static final long serialVersionUID = 1L;
 
+	public static final String TASK_NAME = "nest.local.install";
+
 	private static final class LocalInstallTask implements ParameterizableTask<Object> {
 		@SakerInput(value = { "", "Bundle", "Bundles" }, required = true)
 		public Collection<WildcardPath> bundles = Collections.emptyList();
@@ -80,6 +83,9 @@ public class LocalInstallTaskFactory extends FrontendTaskFactory<Object> {
 
 		@Override
 		public Object run(TaskContext taskcontext) throws Exception {
+			if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+				BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_FRONTEND);
+			}
 			Collection<FileCollectionStrategy> collectionstrategies = new HashSet<>();
 			for (WildcardPath bundlewc : bundles) {
 				collectionstrategies.add(WildcardFileCollectionStrategy.create(bundlewc));

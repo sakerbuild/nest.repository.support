@@ -1,0 +1,23 @@
+global(DEPS) = [
+	simple.bundle
+]
+
+static(other) = nest.dependency.resolve(
+	dep.bundle,
+	Filters: nest.dependency.filter.kind([]),
+)
+
+build(
+	out output,
+	out deps,
+){
+	$resolved = nest.dependency.resolve(
+		global(DEPS), 
+		Filters: nest.dependency.filter.compile(CompileTransitive: false)
+	)
+	$output = $resolved[Bundles]
+	$deps = global(DEPS)
+	
+	print($resolved)
+	#print(static(other))
+}

@@ -26,9 +26,11 @@ import saker.build.task.Task;
 import saker.build.task.TaskContext;
 import saker.build.task.TaskFactory;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
+import saker.build.trace.BuildTrace;
 import saker.nest.bundle.BundleKey;
 import saker.nest.support.api.localize.LocalizeBundleWorkerTaskOutput;
 import saker.nest.support.impl.util.BundleKeyLocalPathExecutionProperty;
+import saker.nest.support.main.localize.LocalizeBundleTaskFactory;
 
 public class BundleKeyLocalizingWorkerTaskFactory
 		implements TaskFactory<LocalizeBundleWorkerTaskOutput>, Task<LocalizeBundleWorkerTaskOutput>, Externalizable {
@@ -53,6 +55,12 @@ public class BundleKeyLocalizingWorkerTaskFactory
 
 	@Override
 	public LocalizeBundleWorkerTaskOutput run(TaskContext taskcontext) throws Exception {
+		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
+			BuildTrace.setDisplayInformation("nest.localize:" + bundleKey.getBundleIdentifier(), null);
+		}
+		taskcontext.setStandardOutDisplayIdentifier(LocalizeBundleTaskFactory.TASK_NAME);
+
 		SakerPath localPath = taskcontext.getTaskUtilities()
 				.getReportExecutionDependency(new BundleKeyLocalPathExecutionProperty(bundleKey));
 

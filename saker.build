@@ -1,4 +1,4 @@
-global(VERSION_nest.repository.support) = "0.8.1"
+global(VERSION_nest.repository.support) = "0.8.2"
 
 static(VERSION_saker.build) = nest.dependency.resolve(
 	saker.build,
@@ -206,6 +206,7 @@ test() {
 		IgnoreFileChanges: [
 			std.file.place(test/build),
 		],
+		#ProcessJVMParameters: [ "-agentlib:jdwp=transport=dt_socket,address=localhost:5432,server=y,suspend=y,quiet=y" ],
 		WorkingDirectory: main,
 		MaxJVMCount: 1,
 		FailFast: true,

@@ -31,11 +31,14 @@ import saker.build.task.Task;
 import saker.build.task.TaskContext;
 import saker.build.task.TaskFactory;
 import saker.build.thirdparty.saker.util.StringUtils;
+import saker.build.trace.BuildTrace;
+import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.BundleKey;
 import saker.nest.bundle.storage.LocalBundleStorageView;
 import saker.nest.bundle.storage.LocalBundleStorageView.InstallResult;
 import saker.nest.support.api.local.install.LocalInstallWorkerTaskOutput;
 import saker.nest.support.impl.util.BundleKeyContentDescriptorExecutionProperty;
+import saker.nest.support.main.local.install.LocalInstallTaskFactory;
 
 public class BundleInstallerTaskFactory implements TaskFactory<LocalInstallWorkerTaskOutput>, Externalizable {
 	private static final long serialVersionUID = 1L;
@@ -59,6 +62,12 @@ public class BundleInstallerTaskFactory implements TaskFactory<LocalInstallWorke
 		return new Task<LocalInstallWorkerTaskOutput>() {
 			@Override
 			public LocalInstallWorkerTaskOutput run(TaskContext taskcontext) throws Exception {
+				if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+					BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
+					BuildTrace.setDisplayInformation("nest.install:" + bundlePath.getFileName(), null);
+				}
+				taskcontext.setStandardOutDisplayIdentifier(LocalInstallTaskFactory.TASK_NAME);
+
 				SakerFile bundlefile = taskcontext.getTaskUtilities().resolveFileAtPath(bundlePath);
 				if (bundlefile == null) {
 					throw new NoSuchFileException(bundlePath.toString(), null, "Bundle JAR file not found.");
@@ -76,26 +85,28 @@ public class BundleInstallerTaskFactory implements TaskFactory<LocalInstallWorke
 				}
 				taskcontext.getTaskUtilities().reportInputFileDependency(null, bundlefile);
 				InstallResult installresult;
+				BundleIdentifier installedbundleid;
 				try {
 					LocalBundleStorageView storageview = localstorageproperty.getStorageView();
 					installresult = storageview.install(bundlefile);
+					installedbundleid = installresult.getBundleIdentifier();
 					SakerLog.success().out(taskcontext).verbose()
-							.println("Bundle successfully installed: " + SakerPathFiles.toRelativeString(bundlePath));
+							.println("Bundle successfully installed: " + installedbundleid);
 
 					ContentDescriptor hashcd = BundleKeyContentDescriptorExecutionProperty
 							.createContentDescriptorForBundleHash(installresult.getBundleHash());
 
 					//install a dependency that tracks the current bundle hash, and reinvokes this task if changes
 					taskcontext.reportExecutionDependency(
-							new BundleKeyContentDescriptorExecutionProperty(BundleKey
-									.create(storageview.getStorageViewKey(), installresult.getBundleIdentifier())),
+							new BundleKeyContentDescriptorExecutionProperty(
+									BundleKey.create(storageview.getStorageViewKey(), installedbundleid)),
 							new BundleKeyContentDescriptorExecutionProperty.PropertyResult(null, hashcd));
 				} catch (Exception e) {
 					SakerLog.error().out(taskcontext).println("Failed to install bundle: "
 							+ SakerPathFiles.toRelativeString(bundlePath) + " (" + e + ")");
 					throw e;
 				}
-				return new LocalInstallWorkerTaskOutputImpl(installresult.getBundleIdentifier(),
+				return new LocalInstallWorkerTaskOutputImpl(installedbundleid,
 						StringUtils.toHexString(installresult.getBundleHash()));
 			}
 		};

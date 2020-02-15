@@ -31,6 +31,7 @@ import saker.build.task.utils.SimpleStructuredObjectTaskResult;
 import saker.build.task.utils.annot.SakerInput;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.ObjectUtils;
+import saker.build.trace.BuildTrace;
 import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.BundleInformation;
 import saker.nest.bundle.DependencyConstraintConfiguration;
@@ -130,6 +131,10 @@ public class ResolveBundleDependencyTaskFactory extends FrontendTaskFactory<Obje
 
 		@Override
 		public Object run(TaskContext taskcontext) throws Exception {
+			if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+				BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_FRONTEND);
+			}
+
 			if (this.bundles == null && this.dependencyFile == null) {
 				taskcontext
 						.abortExecution(new IllegalArgumentException("Bundles or DependencyFile parameter missing."));

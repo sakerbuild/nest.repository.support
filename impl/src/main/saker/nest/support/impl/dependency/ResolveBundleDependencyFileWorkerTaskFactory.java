@@ -34,6 +34,7 @@ import saker.build.task.identifier.TaskIdentifier;
 import saker.build.thirdparty.saker.util.ImmutableUtils;
 import saker.build.thirdparty.saker.util.ObjectUtils;
 import saker.build.thirdparty.saker.util.io.SerialUtils;
+import saker.build.trace.BuildTrace;
 import saker.nest.bundle.BundleDependency;
 import saker.nest.bundle.BundleDependencyInformation;
 import saker.nest.bundle.BundleDependencyList;
@@ -41,6 +42,7 @@ import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.DependencyConstraintConfiguration;
 import saker.nest.support.api.dependency.DependencyResolutionTaskOutput;
 import saker.nest.support.api.dependency.filter.DependencyFilter;
+import saker.nest.support.main.dependency.ResolveBundleDependencyTaskFactory;
 import saker.nest.version.ExactVersionRange;
 import saker.nest.version.MinimumVersionRange;
 import saker.nest.version.VersionRange;
@@ -71,6 +73,11 @@ public class ResolveBundleDependencyFileWorkerTaskFactory extends ResolveDepende
 
 	@Override
 	public DependencyResolutionTaskOutput run(TaskContext taskcontext) throws Exception {
+		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
+			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
+		}
+		taskcontext.setStandardOutDisplayIdentifier(ResolveBundleDependencyTaskFactory.TASK_NAME);
+
 		BundleDependencyInformation bundledependencyinfo = BundleDependencyInformation.EMPTY;
 		if (dependencyFilePath != null) {
 			SakerFile depfile = taskcontext.getTaskUtilities().resolveFileAtPath(dependencyFilePath);
