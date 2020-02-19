@@ -117,6 +117,28 @@ public class ResolveBundleDependencyFileWorkerTaskFactory implements TaskFactory
 				if (dependencyFilePath != null) {
 					valmap.put("Dependency file", dependencyFilePath.toString());
 				}
+				if (constraints != null) {
+					Map<String, Object> constraintvals = new LinkedHashMap<>();
+					String bsver = constraints.getBuildSystemVersion();
+					Integer jremajor = constraints.getJreMajorVersion();
+					String natarch = constraints.getNativeArchitecture();
+					String repover = constraints.getRepositoryVersion();
+					if (jremajor != null) {
+						constraintvals.put("JRE major version", jremajor);
+					}
+					if (natarch != null) {
+						constraintvals.put("Native architecture", natarch);
+					}
+					if (bsver != null) {
+						constraintvals.put("Saker.build version", bsver);
+					}
+					if (repover != null) {
+						constraintvals.put("Saker.nest version", repover);
+					}
+					if (!constraintvals.isEmpty()) {
+						valmap.put("Dependency constraints", constraintvals);
+					}
+				}
 				BuildTrace.setValues(valmap, BuildTrace.VALUE_CATEGORY_TASK);
 			}
 		}
