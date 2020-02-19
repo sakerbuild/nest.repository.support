@@ -19,6 +19,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Collections;
 
 import saker.build.file.path.SakerPath;
 import saker.build.runtime.execution.ExecutionContext;
@@ -27,6 +28,7 @@ import saker.build.task.TaskContext;
 import saker.build.task.TaskFactory;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.trace.BuildTrace;
+import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.BundleKey;
 import saker.nest.support.api.localize.LocalizeBundleWorkerTaskOutput;
 import saker.nest.support.impl.util.BundleKeyLocalPathExecutionProperty;
@@ -57,7 +59,12 @@ public class BundleKeyLocalizingWorkerTaskFactory
 	public LocalizeBundleWorkerTaskOutput run(TaskContext taskcontext) throws Exception {
 		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
 			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
-			BuildTrace.setDisplayInformation("nest.localize:" + bundleKey.getBundleIdentifier(), null);
+			BundleIdentifier bundleid = bundleKey.getBundleIdentifier();
+			BuildTrace.setDisplayInformation("nest.localize:" + bundleid, null);
+			if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_009) {
+				BuildTrace.setValues(Collections.singletonMap("Bundle identifier", bundleid.toString()),
+						BuildTrace.VALUE_CATEGORY_TASK);
+			}
 		}
 		taskcontext.setStandardOutDisplayIdentifier(LocalizeBundleTaskFactory.TASK_NAME);
 

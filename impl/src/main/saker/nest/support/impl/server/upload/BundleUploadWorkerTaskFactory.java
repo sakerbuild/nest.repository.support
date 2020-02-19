@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.jar.JarInputStream;
 
 import saker.build.file.SakerFile;
@@ -74,6 +76,15 @@ public class BundleUploadWorkerTaskFactory
 		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
 			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
 			BuildTrace.setDisplayInformation("nest.upload:" + bundlePath.getFileName(), null);
+			if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_009) {
+				Map<String, Object> valmap = new LinkedHashMap<>();
+				valmap.put("Path", bundlePath.toString());
+				valmap.put("Server", server);
+				if (overwrite != null) {
+					valmap.put("Overwrite", true);
+				}
+				BuildTrace.setValues(valmap, BuildTrace.VALUE_CATEGORY_TASK);
+			}
 		}
 		taskcontext.setStandardOutDisplayIdentifier(ServerUploadTaskFactory.TASK_NAME);
 
@@ -108,6 +119,15 @@ public class BundleUploadWorkerTaskFactory
 
 		String md5 = StringUtils.toHexString(uploadresult.getMD5Hash());
 		String sha256 = StringUtils.toHexString(uploadresult.getSHA256Hash());
+
+		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_009) {
+			Map<String, Object> valmap = new LinkedHashMap<>();
+			valmap.put("Bundle identifier", bundleid.toString());
+			valmap.put("MD5", md5);
+			valmap.put("SHA256", sha256);
+			BuildTrace.setValues(valmap, BuildTrace.VALUE_CATEGORY_TASK);
+		}
+
 		return new BundleUploadWorkerTaskOutputImpl(bundleid, md5, sha256);
 	}
 

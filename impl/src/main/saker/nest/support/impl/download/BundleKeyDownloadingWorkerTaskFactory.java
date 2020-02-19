@@ -19,6 +19,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Collections;
 import java.util.Objects;
 
 import saker.build.exception.PropertyComputationFailedException;
@@ -35,6 +36,7 @@ import saker.build.task.TaskFactory;
 import saker.build.thirdparty.saker.util.ObjectUtils;
 import saker.build.thirdparty.saker.util.StringUtils;
 import saker.build.trace.BuildTrace;
+import saker.nest.bundle.BundleIdentifier;
 import saker.nest.bundle.BundleKey;
 import saker.nest.bundle.JarNestRepositoryBundle;
 import saker.nest.bundle.NestRepositoryBundle;
@@ -68,7 +70,12 @@ public class BundleKeyDownloadingWorkerTaskFactory
 	public DownloadBundleWorkerTaskOutput run(TaskContext taskcontext) throws Exception {
 		if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
 			BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
-			BuildTrace.setDisplayInformation("nest.download:" + bundleKey.getBundleIdentifier(), null);
+			BundleIdentifier bundleid = bundleKey.getBundleIdentifier();
+			BuildTrace.setDisplayInformation("nest.download:" + bundleid, null);
+			if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_009) {
+				BuildTrace.setValues(Collections.singletonMap("Bundle identifier", bundleid.toString()),
+						BuildTrace.VALUE_CATEGORY_TASK);
+			}
 		}
 		taskcontext.setStandardOutDisplayIdentifier(DownloadBundleTaskFactory.TASK_NAME);
 

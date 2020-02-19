@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.nio.file.NoSuchFileException;
+import java.util.Collections;
 
 import saker.build.file.SakerFile;
 import saker.build.file.content.ContentDescriptor;
@@ -65,6 +66,10 @@ public class BundleInstallerTaskFactory implements TaskFactory<LocalInstallWorke
 				if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_006) {
 					BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_WORKER);
 					BuildTrace.setDisplayInformation("nest.install:" + bundlePath.getFileName(), null);
+					if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_009) {
+						BuildTrace.setValues(Collections.singletonMap("Path", bundlePath.toString()),
+								BuildTrace.VALUE_CATEGORY_TASK);
+					}
 				}
 				taskcontext.setStandardOutDisplayIdentifier(LocalInstallTaskFactory.TASK_NAME);
 
@@ -105,6 +110,10 @@ public class BundleInstallerTaskFactory implements TaskFactory<LocalInstallWorke
 					SakerLog.error().out(taskcontext).println("Failed to install bundle: "
 							+ SakerPathFiles.toRelativeString(bundlePath) + " (" + e + ")");
 					throw e;
+				}
+				if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_009) {
+					BuildTrace.setValues(Collections.singletonMap("Bundle identifier", installedbundleid.toString()),
+							BuildTrace.VALUE_CATEGORY_TASK);
 				}
 				return new LocalInstallWorkerTaskOutputImpl(installedbundleid,
 						StringUtils.toHexString(installresult.getBundleHash()));
