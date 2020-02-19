@@ -81,7 +81,7 @@ public class BundleUploadWorkerTaskFactory
 				valmap.put("Path", bundlePath.toString());
 				valmap.put("Server", server);
 				if (overwrite != null) {
-					valmap.put("Overwrite", true);
+					valmap.put("Overwrite", overwrite);
 				}
 				BuildTrace.setValues(valmap, BuildTrace.VALUE_CATEGORY_TASK);
 			}
