@@ -46,6 +46,7 @@ import saker.nest.support.impl.dependency.filter.ChainDependencyFilter;
 import saker.nest.support.main.TaskDocs.DocBundleIdentifier;
 import saker.nest.support.main.TaskDocs.DocDependencyFilter;
 import saker.nest.support.main.TaskDocs.DocDependencyResolutionTaskOutput;
+import saker.nest.support.main.TaskDocs.DocSakerPath;
 import saker.nest.support.main.dependency.filter.CompileDependencyFilterTaskFactory;
 import saker.nest.support.main.dependency.filter.KindDependencyFilterTaskFactory;
 import saker.nest.utils.FrontendTaskFactory;
@@ -67,7 +68,7 @@ import saker.nest.utils.FrontendTaskFactory;
 				+ "If used together with DependencyFile, the specified bundles will be effectively added to the set of dependencies defined "
 				+ "in the file. This parameter can also be used to pin bundles when a version numbers are specified."))
 @NestParameterInformation(value = "DependencyFile",
-		type = @NestTypeUsage(SakerPath.class),
+		type = @NestTypeUsage(DocSakerPath.class),
 		info = @NestInformation("Path to a saker.nest bundle dependency file from which the dependencies should be resolved.\n"
 				+ "The argument is a path to a file present in Nest repository bundles, which describe the dependencies of an "
 				+ "associated bundle. (Entry " + BundleInformation.ENTRY_BUNDLE_DEPENDENCIES + ")\n"

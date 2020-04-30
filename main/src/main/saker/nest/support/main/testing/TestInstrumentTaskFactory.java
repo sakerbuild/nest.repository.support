@@ -41,6 +41,7 @@ import saker.nest.support.impl.util.BundleIdentifierBundleKeyExecutionProperty;
 import saker.nest.support.impl.util.BundleVersionsLookupExecutionProperty;
 import saker.nest.support.impl.util.BundleVersionsLookupExecutionProperty.PropertyLookupResult;
 import saker.nest.support.main.TaskDocs.DocInstrumentedArchivePath;
+import saker.nest.support.main.TaskDocs.DocSakerPath;
 import saker.nest.support.main.TaskDocs.DocVersionNumber;
 import saker.nest.utils.FrontendTaskFactory;
 
@@ -52,7 +53,7 @@ import saker.nest.utils.FrontendTaskFactory;
 @NestParameterInformation(value = "Archive",
 		aliases = "",
 		required = true,
-		type = @NestTypeUsage(SakerPath.class),
+		type = @NestTypeUsage(DocSakerPath.class),
 		info = @NestInformation("Path to the base archive to which the instrumentation should be added.\n"
 				+ "The archive itself is not modified, but a new archive is created with the contents of the base "
 				+ "archive and the instrumentation classes."))
@@ -62,7 +63,7 @@ import saker.nest.utils.FrontendTaskFactory;
 				+ "added as the instrumentation to the base archive.\n"
 				+ "If not specified, the latest release is used."))
 @NestParameterInformation(value = "Output",
-		type = @NestTypeUsage(SakerPath.class),
+		type = @NestTypeUsage(DocSakerPath.class),
 		info = @NestInformation("Specifies a relative output path where the instrumented archive should be created.\n"
 				+ "The path is the relative path under the " + TestInstrumentTaskFactory.TASK_NAME
 				+ " directory in the build directory."))

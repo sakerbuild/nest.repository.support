@@ -48,6 +48,7 @@ import saker.nest.support.api.local.install.LocalInstallWorkerTaskOutput;
 import saker.nest.support.api.property.RepositoryPropertyUtils;
 import saker.nest.support.impl.NestSupportImpl;
 import saker.nest.support.main.TaskDocs.DocLocalInstallTaskOutput;
+import saker.nest.support.main.TaskDocs.DocWildcardPath;
 import saker.nest.utils.FrontendTaskFactory;
 
 @NestTaskInformation(returnType = @NestTypeUsage(DocLocalInstallTaskOutput.class))
@@ -60,7 +61,7 @@ import saker.nest.utils.FrontendTaskFactory;
 @NestParameterInformation(value = "Bundle",
 		aliases = { "", "Bundles" },
 		required = true,
-		type = @NestTypeUsage(value = Collection.class, elementTypes = WildcardPath.class),
+		type = @NestTypeUsage(value = Collection.class, elementTypes = DocWildcardPath.class),
 		info = @NestInformation("Specifies one or more bundles to be installed.\n"
 				+ "The option accepts simple paths or wildcards to the bundles that should be installed."))
 @NestParameterInformation(value = "StorageName",

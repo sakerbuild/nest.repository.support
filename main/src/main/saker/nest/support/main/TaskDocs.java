@@ -29,8 +29,59 @@ import saker.nest.support.main.localize.LocalizeBundleTaskFactory;
 
 public class TaskDocs {
 	@NestTypeInformation(kind = TypeInformationKind.LITERAL, qualifiedName = "saker.nest.bundle.BundleIdentifier")
-	@NestInformation("Nest repository bundle identifier.")
+	@NestInformation("Nest repository bundle identifier.\n"
+			+ "A bundle identifier consists of a bundle name and any amount of qualifiers. Bundle identifier have "
+			+ "the format of <name>[-qualifier]*.\n"
+			+ "The version qualifier in the format of v1.2.3 is a special meta-qualifier that may be interpreted in various "
+			+ "way in a given context.")
+	@NestFieldInformation(value = "VersionQualifier",
+			type = @NestTypeUsage(String.class),
+			info = @NestInformation("The version qualifier of the bundle identifier.\n"
+					+ "The version qualifier is in the v1.2.3 format. May be null."))
+	@NestFieldInformation(value = "VersionNumber",
+			type = @NestTypeUsage(String.class),
+			info = @NestInformation("The version number of the bundle identifier.\n"
+					+ "The version number is in the 1.2.3 format. It doesn't have a preceeding 'v' character. May be null."))
+	@NestFieldInformation(value = "Name",
+			type = @NestTypeUsage(String.class),
+			info = @NestInformation("The name part of the bundle identifier."))
 	public static class DocBundleIdentifier {
+	}
+
+	@NestTypeInformation(kind = TypeInformationKind.PATH, qualifiedName = "saker.build.file.path.SakerPath")
+	@NestInformation("A path object representing a file location with a root and list of name components.\n"
+			+ "A path may be relative or absolute. Absolute paths contain a root, which may be either the slash / root or "
+			+ "have the [a-z]+: format.\n"
+			+ "Relative paths contain no root and consist only of name components. Only relative paths may contain the \"..\" "
+			+ "name component and only at the start of theirs.\n"
+			+ "All paths case sensitive and are handled in normalized format.")
+	@NestFieldInformation(value = "Root",
+			type = @NestTypeUsage(String.class),
+			info = @NestInformation("The root component of the path.\n" + "May be null if the path is relative. \n"
+					+ "Can be either the slash root: /\n" + "Or in the format [a-z]+:"))
+	@NestFieldInformation(value = "FileName",
+			type = @NestTypeUsage(String.class),
+			info = @NestInformation("The file name component of the path.\n"
+					+ "It is usually the last component of the path, but may be null in cases where the path doesn't have one.\n"
+					+ "E.g. \"..\", or \"/\" doesn't have file names."))
+	@NestFieldInformation(value = "LastName",
+			type = @NestTypeUsage(String.class),
+			info = @NestInformation("The last name component of the path.\n"
+					+ "It is the last name part of the path. May be null if the path doesn't have any names "
+					+ "when it is the empty path, or simply a root path."))
+	@NestFieldInformation(value = "Parent",
+			type = @NestTypeUsage(DocSakerPath.class),
+			info = @NestInformation("The parent of the path.\n"
+					+ "May be null if no parent exists for the path, meaning that this is an absolute path that has no names."))
+	public static class DocSakerPath {
+	}
+
+	@NestTypeInformation(kind = TypeInformationKind.WILDCARD_PATH, qualifiedName = "saker.build.file.path.WildcardPath")
+	@NestInformation("Wildcard paths represent a pattern that are used to match paths in order to determine their inclusion.\n"
+			+ "Wildcard paths contain the * character that can match any number of arbitrary characters in a name component of a path.\n"
+			+ "The special \"**\" name part can be used to match any number of name components for a given path.\n"
+			+ "Wildcards which don't contain any * characters can be also used as wildcards, but they will only match a single path.")
+	public static class DocWildcardPath {
 	}
 
 	@NestTypeInformation(qualifiedName = "saker.nest.bundle.BundleKey")
