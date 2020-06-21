@@ -61,7 +61,6 @@ import saker.nest.dependency.DependencyDomainResolutionResult;
 import saker.nest.dependency.DependencyUtils;
 import saker.nest.exc.BundleDependencyUnsatisfiedException;
 import saker.nest.exc.BundleLoadingFailedException;
-import saker.nest.meta.Versions;
 import saker.nest.support.api.dependency.DependencyResolutionTaskOutput;
 import saker.nest.support.api.dependency.filter.DependencyFilter;
 import saker.nest.support.impl.dependency.filter.ConstraintDependencyFilter;
@@ -258,7 +257,7 @@ public class ResolveBundleDependencyFileWorkerTaskFactory implements TaskFactory
 			return null;
 		};
 
-		if (Versions.VERSION_MAJOR == 0 && Versions.VERSION_MINOR <= 8 && Versions.VERSION_PATCH < 1) {
+		if (saker.nest.meta.Versions.VERSION_FULL_COMPOUND < 8_001) {
 			//domain based dependency resolution is not yet available
 			//use legacy
 			return executeLegacyDependencyResolution(taskcontext, depinfo, rootbundlekey, bundleslookupfunction,
@@ -389,7 +388,7 @@ public class ResolveBundleDependencyFileWorkerTaskFactory implements TaskFactory
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
+		int result = 1;
 		result = prime * result + ((bundleIds == null) ? 0 : bundleIds.hashCode());
 		result = prime * result + ((constraints == null) ? 0 : constraints.hashCode());
 		result = prime * result + ((dependencyFilePath == null) ? 0 : dependencyFilePath.hashCode());
@@ -402,7 +401,7 @@ public class ResolveBundleDependencyFileWorkerTaskFactory implements TaskFactory
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;

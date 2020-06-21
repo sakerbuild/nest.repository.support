@@ -26,7 +26,6 @@ import saker.build.thirdparty.saker.util.io.SerialUtils;
 import saker.nest.bundle.BundleDependency;
 import saker.nest.bundle.BundleDependencyInformation;
 import saker.nest.bundle.BundleKey;
-import saker.nest.meta.Versions;
 import saker.nest.support.api.dependency.filter.DependencyFilter;
 
 public class CompileDependencyFilter implements DependencyFilter, Externalizable {
@@ -89,7 +88,7 @@ public class CompileDependencyFilter implements DependencyFilter, Externalizable
 	}
 
 	private static boolean dependencyIsPrivate(BundleDependency bd) {
-		if (Versions.VERSION_MAJOR == 0 && Versions.VERSION_MINOR == 8 && Versions.VERSION_PATCH < 1) {
+		if (saker.nest.meta.Versions.VERSION_FULL_COMPOUND < 8_001) {
 			return Boolean.parseBoolean(bd.getMetaData().get("private"));
 		}
 		return bd.isPrivate();
