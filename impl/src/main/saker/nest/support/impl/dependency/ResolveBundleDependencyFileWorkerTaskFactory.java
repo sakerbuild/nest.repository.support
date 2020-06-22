@@ -78,7 +78,13 @@ public class ResolveBundleDependencyFileWorkerTaskFactory implements TaskFactory
 	protected DependencyFilter filter;
 	protected DependencyConstraintConfiguration constraints;
 
-	protected Set<BundleIdentifier> bundleIds;
+	/**
+	 * The list of bundle identifiers to resolve.
+	 * <p>
+	 * This field is a {@link List} instead of a {@link Set} for conistent equality. The order of the collection
+	 * matters, so using {@link Set} is not suitable.
+	 */
+	protected List<BundleIdentifier> bundleIds;
 	protected SakerPath dependencyFilePath;
 	protected BundleIdentifier thisBundleId;
 
@@ -94,8 +100,8 @@ public class ResolveBundleDependencyFileWorkerTaskFactory implements TaskFactory
 		this.filter = filter;
 		this.constraints = constraints;
 		this.dependencyFilePath = dependencyFilePath;
-		this.bundleIds = ObjectUtils.isNullOrEmpty(bundleIds) ? Collections.emptySet()
-				: ImmutableUtils.makeImmutableLinkedHashSet(bundleIds);
+		this.bundleIds = ObjectUtils.isNullOrEmpty(bundleIds) ? Collections.emptyList()
+				: ImmutableUtils.makeImmutableList(bundleIds);
 		this.thisBundleId = thisBundleId;
 	}
 
@@ -381,7 +387,7 @@ public class ResolveBundleDependencyFileWorkerTaskFactory implements TaskFactory
 		filter = (DependencyFilter) in.readObject();
 		constraints = (DependencyConstraintConfiguration) in.readObject();
 		dependencyFilePath = (SakerPath) in.readObject();
-		bundleIds = SerialUtils.readExternalImmutableLinkedHashSet(in);
+		bundleIds = SerialUtils.readExternalImmutableList(in);
 		thisBundleId = (BundleIdentifier) in.readObject();
 	}
 
