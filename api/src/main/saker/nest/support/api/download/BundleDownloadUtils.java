@@ -56,7 +56,7 @@ public final class BundleDownloadUtils {
 	 * @return The bundle downloading task.
 	 * @throws NullPointerException
 	 *             If the argument is <code>null</code>.
-	 * @see {@link #createBundleDownloadWorkerTaskIdentifier(BundleKey)}
+	 * @see #createBundleDownloadWorkerTaskIdentifier(BundleKey)
 	 */
 	public static TaskFactory<? extends DownloadBundleWorkerTaskOutput> createBundleDownloadWorkerTask(
 			BundleKey bundlekey) throws NullPointerException {

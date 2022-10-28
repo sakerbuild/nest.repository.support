@@ -56,7 +56,7 @@ public final class BundleLocalizeUtils {
 	 * @return The bundle localization task.
 	 * @throws NullPointerException
 	 *             If the argument is <code>null</code>.
-	 * @see {@link #createBundleLocalizeWorkerTaskIdentifier(BundleKey)}
+	 * @see #createBundleLocalizeWorkerTaskIdentifier(BundleKey)
 	 */
 	public static TaskFactory<? extends LocalizeBundleWorkerTaskOutput> createBundleLocalizeWorkerTask(
 			BundleKey bundlekey) throws NullPointerException {
